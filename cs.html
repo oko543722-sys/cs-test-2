@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSGO Skrzynka z obrazkami</title>
+  <style>
+    body { font-family: sans-serif; background:#1b1b1b; color:#fff; text-align:center; padding:40px; }
+    .container { max-width:600px; margin:auto; }
+    button { background:#ffae00; color:#000; border:none; padding:15px 30px; font-size:18px; cursor:pointer; border-radius:8px; margin-top:20px; transition:0.3s; }
+    button:hover { background:#ffc933; }
+    .case-container { width:100%; height:120px; overflow:hidden; border:2px solid #fff; border-radius:8px; margin:20px 0; position:relative; }
+    .case-roller { display:flex; flex-direction:column; align-items:center; transition:transform 2s cubic-bezier(0.25,0.1,0.25,1); }
+    .case-item { height:120px; display:flex; justify-content:center; align-items:center; font-size:24px; }
+    .case-item img { height:100px; border-radius:8px; border:2px solid #fff; margin:0 10px; }
+    #result { margin-top:20px; font-size:20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Otwórz Skrzynkę!</h1>
+    <div class="case-container">
+      <div class="case-roller" id="caseRoller"></div>
+    </div>
+    <button id="openBtn">🎲 Otwórz Skrzynkę</button>
+    <div id="result"></div>
+  </div>
+  <script>
+    const caseItems = [
+      { name: "AWP | Dragon Lore", img: "https://i.imgur.com/Z6UQ2JD.png", chance: 1 },
+      { name: "AK-47 | Redline", img: "https://i.imgur.com/2yD8jFl.png", chance: 10 },
+      { name: "P90 | Elite Build", img: "https://i.imgur.com/Wx0GcVZ.png", chance: 30 },
+      { name: "UMP-45 | Scorched", img: "https://i.imgur.com/NuYcM3s.png", chance: 59 },
+    ];
+
+    const roller = document.getElementById("caseRoller");
+    const resultDiv = document.getElementById("result");
+    const openBtn = document.getElementById("openBtn");
+
+    function getRandomItem() {
+      let rand = Math.random() * 100;
+      let cumulative = 0;
+      for (let item of caseItems) {
+        cumulative += item.chance;
+        if (rand <= cumulative) return item;
+      }
+      return caseItems[caseItems.length - 1];
+    }
+
+    function openCase() {
+      roller.innerHTML = "";
+      roller.style.transition = "none";
+      roller.style.transform = `translateY(0px)`;
+
+      const selected = getRandomItem();
+
+      // Dodaj losowe przedmioty
+      for (let i = 0; i < 5; i++) {
+        const item = caseItems[Math.floor(Math.random() * caseItems.length)];
+        const div = document.createElement("div");
+        div.classList.add("case-item");
+        div.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
+        roller.appendChild(div);
+      }
+
+      // Dodaj wylosowany przedmiot na końcu
+      const finalDiv = document.createElement("div");
+      finalDiv.classList.add("case-item");
+      finalDiv.innerHTML = `<img src="${selected.img}" alt="${selected.name}">`;
+      roller.appendChild(finalDiv);
+
+      // Animacja przewinięcia
+      const offset = 120 * 5;
+      setTimeout(() => {
+        roller.style.transition = "transform 1.5s ease-out";
+        roller.style.transform = `translateY(-${offset}px)`;
+      }, 50);
+
+      setTimeout(() => {
+        resultDiv.innerHTML = `Wygrałeś: <strong>${selected.name}</strong>`;
+      }, 1600);
+    }
+
+    openBtn.addEventListener("click", openCase);
+  </script>
+</body>
+</html>
